@@ -32,10 +32,25 @@ defmodule ResourceAccessCheck do
 
     case GAPI.resources(app_key) do
       {:ok, resources} ->
-        Enum.join(resources, "\n") |> IO.puts()
+        additional = second_list_lacks(resources, GAPI.all_resources())
+
+        Enum.join(additional, "\n")
+        |> (&["The key has these additional resources\n", &1]).()
+        |> IO.puts()
+
+        lacks = second_list_lacks(GAPI.all_resources(), resources)
+
+        Enum.join(lacks, "\n")
+        |> (&["The key lacks these resources\n", &1]).()
+        |> IO.puts()
 
       {:error, reason} ->
         IO.puts(["Failure: ", reason])
     end
+  end
+
+  @spec second_list_lacks(list(String.t()), list(String.t())) :: list(String.t())
+  def second_list_lacks(total_list, inspect_list) do
+    Enum.filter(total_list, fn x -> not Enum.member?(inspect_list, x) end)
   end
 end
