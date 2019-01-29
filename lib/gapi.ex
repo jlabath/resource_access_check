@@ -67,6 +67,45 @@ defmodule GAPI do
     end
   end
 
+  @spec add_perm(String.t(), String.t(), String.t()) :: :ok | {:error, term}
+  def add_perm(app_key, perm_key, resource) do
+    res = %{resource => "*"}
+    data = %{"permissions" => res}
+
+    case JSON.encode(data) do
+      {:ok, body} ->
+        IO.puts(body)
+
+        response =
+          :httpc.request(
+            :patch,
+            {'https://rest.gadventures.com/application_keys/#{app_key}',
+             [{'X-Application-Key', to_charlist(perm_key)}], 'application/json',
+             to_charlist(body)},
+            [],
+            []
+          )
+
+        case response do
+          {:ok, {{'HTTP/1.1', 200, _}, _headers, _body}} ->
+            :ok
+
+          {:ok, {{'HTTP/1.1', code, err}, _headers, _body}} ->
+            fjoin = fn lst -> Enum.join(lst, " ") end
+            {:error, Enum.map(["#{resource} => HTTP/1.1", code, err], &to_string/1) |> fjoin.()}
+
+          {:error, {a, b}} ->
+            {:error, Enum.join(["Error #{resource}:", to_string(a), to_string(b)], " ")}
+
+          _ ->
+            {:error, "utter and unknown fail for #{resource}"}
+        end
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
   @spec all_resources() :: list(String.t())
   def all_resources() do
     [

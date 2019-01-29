@@ -8,7 +8,8 @@ defmodule ResourceAccessCheck.MixProject do
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      escript: escript()
+      escript: escript(),
+      default_task: "escript.build"
     ]
   end
 
