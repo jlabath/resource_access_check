@@ -1,6 +1,6 @@
 # ResourceAccessCheck
 
-**TODO: Add description**
+**Small script to check application key's access for rest.gadventures.com**
 
 ## Installation
 
